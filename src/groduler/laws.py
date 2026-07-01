@@ -16,20 +16,20 @@ class FootprintFit(NamedTuple):
     factor_k: float
 
 
-def _footprint_law_model(atom_size: np.array, fmax: float, factor_k: float) -> float:
+def _footprint_law_model(atom_size: np.array, fmax: float, factor_k: float):
     """ "defining the model for optimization.
 
     Function definition for the fit."""
 
     smact = (fmax * atom_size) / (factor_k + atom_size)
 
-    return smact(np.array)
+    return smact
 
 
 def fitting_law(atom_size: np.array, smact: np.array) -> tuple[float, float]:
     """Finding the footprint parameters by fitting with SciPy."""
 
-    popt, pcov = curve_fit(_footprint_law_model, atomsize, smact, p0=[50, 500])
+    popt, pcov = curve_fit(_footprint_law_model, atom_size, smact, p0=[50, 500])
 
     fmax, factor_k = popt
 
