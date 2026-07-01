@@ -1,0 +1,8 @@
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+*.pyc
+*.pytest_cache/
+.ruff_cache/
+data/ #Raw data/outputs not into repo
+*.png
