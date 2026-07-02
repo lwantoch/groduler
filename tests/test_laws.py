@@ -1,7 +1,7 @@
 import numpy as np
 from pytest import approx
 
-from groduler.laws import fitting_footprint_law, fitting_throughput_law
+from groduler.laws import fitting_footprint_law, fitting_throughput_law, optimal_packing
 
 
 def test_fitting_footprint_law_recovers_known_constants():
@@ -25,3 +25,11 @@ def test_fitting_throughput_law_recovers_known_constants():
 
     assert factor_A == approx(5000.0, abs=1.0)
     assert factor_colocation == approx(20.0, abs=1.0)
+
+
+def test_optimal_packing():
+
+    system_throughput = [10, 200, 5657, 2836, 56, 909]
+    packing_depths = [2, 5, 6, 8, 12, 16]
+    best_packing = packing_depths[np.argmax(system_throughput)]
+    assert best_packing == 6
