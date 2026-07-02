@@ -2,6 +2,7 @@ from typing import NamedTuple
 
 import numpy as np
 from scipy.optimize import curve_fit
+from scipy.stats import linregress
 
 
 class FootprintFit(NamedTuple):
@@ -26,7 +27,7 @@ def _footprint_law_model(atom_size: np.array, fmax: float, factor_k: float):
     return smact
 
 
-def fitting_law(atom_size: np.array, smact: np.array) -> tuple[float, float]:
+def fitting_footprint_law(atom_size: np.array, smact: np.array) -> tuple[float, float]:
     """Finding the footprint parameters by fitting with SciPy."""
 
     popt, pcov = curve_fit(_footprint_law_model, atom_size, smact, p0=[50, 500])
@@ -34,3 +35,30 @@ def fitting_law(atom_size: np.array, smact: np.array) -> tuple[float, float]:
     fmax, factor_k = popt
 
     return fmax, factor_k
+
+
+class ThroughputFit(NamedTuple):
+    """Fitted constants of the Throughput law.
+
+    Throughput law is the defined as percent of ns/day which one job can achieve
+
+       throughput=factor_A*atom_size**factor_colocate
+    """
+
+    factor_A: float
+    factor_colocation: float
+    check_r2: float
+
+
+def fitting_throughput_law(
+    atom_size: np.array, throughput: np.array
+) -> tuple[float, float, float]:
+    """Finding the footprint parameters by fitting with SciPy."""
+
+    fit_throughput = linregress(np.log(atom_size), np.log(throughput))
+
+    factor_colocation = fit_throughput.slope
+    factor_A = np.exp(fit_throughput.intercept)
+    check_r2 = fit_throughput.rvalue
+
+    return factor_colocation, factor_A, check_r2
