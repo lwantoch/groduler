@@ -64,7 +64,8 @@ def fitting_throughput_law(
     return factor_colocation, factor_A, check_r2
 
 
-def optimal_packing(packing_depths: np.ndarray, system_throughput: np.ndarray):
+def optimal_packing(packing_depths: np.ndarray, system_throughput: np.ndarray) -> int:
+    """It finds the best packing composition of system of given class"""
 
     best_packing = packing_depths[np.argmax(system_throughput)]
 
