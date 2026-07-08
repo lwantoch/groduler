@@ -61,7 +61,9 @@ def fitting_throughput_law(
     factor_A = np.exp(fit_throughput.intercept)
     check_r2 = fit_throughput.rvalue
 
-    return factor_colocation, factor_A, check_r2
+    return ThroughputFit(
+        factor_A=factor_A, factor_colocation=factor_colocation, check_r2=check_r2
+    )
 
 
 def optimal_packing(packing_depths: np.ndarray, system_throughput: np.ndarray) -> int:

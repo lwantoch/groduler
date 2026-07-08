@@ -19,12 +19,10 @@ def test_fitting_throughput_law_recovers_known_constants():
     atom_size = np.array([2000.0, 5000.0, 20000.0, 120000.0])
     throughput = 5000 * (atom_size**20)
 
-    factor_colocation, factor_A, check_r2 = fitting_throughput_law(
-        atom_size, throughput
-    )
+    result = fitting_throughput_law(atom_size, throughput)
 
-    assert factor_A == approx(5000.0, abs=1.0)
-    assert factor_colocation == approx(20.0, abs=1.0)
+    assert result.factor_A == approx(5000.0, abs=1.0)
+    assert result.factor_colocation == approx(20.0, abs=1.0)
 
 
 def test_optimal_packing():
