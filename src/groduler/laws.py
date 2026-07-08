@@ -27,14 +27,14 @@ def _footprint_law_model(atom_size: np.array, fmax: float, factor_k: float):
     return smact
 
 
-def fitting_footprint_law(atom_size: np.array, smact: np.array) -> tuple[float, float]:
+def fitting_footprint_law(atom_size: np.array, smact: np.array) -> FootprintFit:
     """Finding the footprint parameters by fitting with SciPy."""
 
     popt, pcov = curve_fit(_footprint_law_model, atom_size, smact, p0=[50, 500])
 
     fmax, factor_k = popt
 
-    return fmax, factor_k
+    return FootprintFit(fmax=fmax, factor_k=factor_k)
 
 
 class ThroughputFit(NamedTuple):
@@ -50,10 +50,8 @@ class ThroughputFit(NamedTuple):
     check_r2: float
 
 
-def fitting_throughput_law(
-    atom_size: np.array, throughput: np.array
-) -> tuple[float, float, float]:
-    """Finding the footprint parameters by fitting with SciPy."""
+def fitting_throughput_law(atom_size: np.array, throughput: np.array) -> ThroughputFit:
+    """Finding the throughput parameters by fitting with SciPy."""
 
     fit_throughput = linregress(np.log(atom_size), np.log(throughput))
 
