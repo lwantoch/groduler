@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 from pytest import approx
 
 from groduler.calibrate import (
@@ -8,6 +9,27 @@ from groduler.calibrate import (
     load_sweep,
     organize_runs,
 )
+
+
+@pytest.fixture
+def medians() -> pd.DataFrame:
+    """Small helper for generating testdata."""
+
+    atom_size = np.array([2000.0, 5000.0, 20000.0, 120000.0])
+    throughput = 500000.0 * atom_size ** (-0.75)  # A=500000, b=-0.75
+    sm_active = 77.0 * atom_size / (atom_size + 8697.0)  # Fmax=77, K=8697
+
+    medians = pd.DataFrame(
+        {
+            "gpu": ["L40S", "L40S", "L40S", "L40S", "RTX"],
+            "atom_size": list(atom_size) + [2000],
+            "colocation_depth": [1, 1, 1, 1, 1],
+            "throughput": list(throughput) + [999.0],  # RTX = Müll
+            "sm_active": list(sm_active) + [10.0],  # RTX = Müll
+        }
+    )
+
+    return medians
 
 
 def test_organize_runs():
@@ -40,22 +62,8 @@ def test_load_sweep(tmp_path):
     assert sweep_data.loc[0, "atom_size"] == 2000
 
 
-def test_calibrate_throughput():
+def test_calibrate_throughput(medians: pd.DataFrame):
     """Checking the calibration function for througput"""
-
-    atom_size = np.array([2000.0, 5000.0, 20000.0, 120000.0])
-    throughput = 500000.0 * atom_size ** (-0.75)  # A=500000, b=-0.75
-    sm_active = 77.0 * atom_size / (atom_size + 8697.0)  # Fmax=77, K=8697
-
-    medians = pd.DataFrame(
-        {
-            "gpu": ["L40S", "L40S", "L40S", "L40S", "RTX"],
-            "atom_size": [2000.0, 5000.0, 20000.0, 120000.0, 2000.0],
-            "colocation_depth": [1, 1, 1, 1, 1],
-            "throughput": list(throughput) + [999.0],  # RTX = Müll
-            "sm_active": list(sm_active) + [10.0],  # RTX = Müll
-        }
-    )
 
     result = calibrate_throughput(medians, "L40S")
 
@@ -64,22 +72,8 @@ def test_calibrate_throughput():
     assert result.factor_colocation == approx(-0.75, abs=1e-3)
 
 
-def test_calibrate_footrint():
+def test_calibrate_footrint(medians: pd.DataFrame):
     """Checking the calibration function for footprint"""
-
-    atom_size = np.array([2000.0, 5000.0, 20000.0, 120000.0])
-    throughput = 500000.0 * atom_size ** (-0.75)  # A=500000, b=-0.75
-    sm_active = 77.0 * atom_size / (atom_size + 8697.0)  # Fmax=77, K=8697
-
-    medians = pd.DataFrame(
-        {
-            "gpu": ["L40S", "L40S", "L40S", "L40S", "RTX"],
-            "atom_size": [2000.0, 5000.0, 20000.0, 120000.0, 2000.0],
-            "colocation_depth": [1, 1, 1, 1, 1],
-            "throughput": list(throughput) + [999.0],  # RTX = Müll
-            "sm_active": list(sm_active) + [10.0],  # RTX = Müll
-        }
-    )
 
     result = calibrate_footprint(medians, "L40S")
 
